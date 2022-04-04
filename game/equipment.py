@@ -42,10 +42,10 @@ class EquipmentData:
         raise RuntimeError
 
     @property
-    def weapon_names(self) -> List[str]:
+    def get_weapon_names(self) -> List[str]:
         return [item.name for item in self.weapons]
 
     @property
-    def armor_names(self) -> List[str]:
+    def get_armor_names(self) -> List[str]:
         return [item.name for item in self.armors]
 

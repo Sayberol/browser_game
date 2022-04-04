@@ -1,24 +1,17 @@
+from typing import Dict
+
 from flask import Flask, render_template, request, redirect, url_for
 
 from game.characters import character_classes
 from game.equipment import EquipmentData
+from game.hero import Player, Hero, Enemy
 from game.utils import load_equipment
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 RESULT: EquipmentData = load_equipment()
 
-
-# def render_choose_character_template(*args, **kwargs) -> str:
-#     return render_template(
-#         'hero_choosing.html',
-#         result={
-#             "classes": character_classes,
-#             "weapons": RESULT.weapons,
-#             "armors": RESULT.armors,
-#
-#         }
-#     )
+heroes: Dict[str, Hero] = dict()
 
 
 @app.route('/')
@@ -34,11 +27,16 @@ def choose_hero():
             result= {
                 "header": "Выберите бойца",
                 "classes": character_classes,
-                "weapons": RESULT.weapons,
-                "armors": RESULT.armors,
+                "weapons": RESULT.get_weapon_names,
+                "armors": RESULT.get_armor_names,
             }
         )
-    # post
+    heroes['player'] = Player(
+        unit_class=character_classes[request.form['unit_class']],
+        weapon=load_equipment().get_weapon(request.form['weapon']),
+        armor=load_equipment().get_armor(request.form['armor']),
+        name=request.form['name']
+    )
     return redirect(url_for('choose_enemy'))
 
 
@@ -50,12 +48,24 @@ def choose_enemy():
             result= {
                 "header": "Выберите противника",
                 "classes": character_classes,
-                "weapons": RESULT.weapons,
-                "armors": RESULT.armors,
+                "weapons": RESULT.get_weapon_names,
+                "armors": RESULT.get_armor_names,
             }
         )
-    # post
-    return '<h2>Not implemented</h2>'
+    heroes['enemy'] = Enemy(
+        unit_class=character_classes[request.form['unit_class']],
+        weapon=load_equipment().get_weapon(request.form['weapon']),
+        armor=load_equipment().get_armor(request.form['armor']),
+        name=request.form['name']
+    )
+    return redirect(url_for('start_fight'))
+
+
+@app.route('/fight')
+def start_fight():
+    if 'player' in heroes and 'enemy' in heroes:
+        return render_template('fight.html', heroes=heroes, results='Начало боя')
+    return redirect(url_for('index'))
 
 
 if __name__ == '__main__':
