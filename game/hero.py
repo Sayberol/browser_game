@@ -15,26 +15,26 @@ class Hero(ABC):
         self.unit_class = unit_class
         self.weapon = weapon
         self.armor = armor
-        self._stamina = self.unit_class.max_stamina
-        self._hp = self.unit_class.max_health
+        self.stamina_points = self.unit_class.max_stamina
+        self.health_points = self.unit_class.max_health
         self.skill_used: bool = False
         self.name = name
 
     @property
     def hp(self):
-        return round(self._hp, 1)
+        return round(self.health_points, 1)
 
     @hp.setter
     def hp(self, value):
-        self._hp = value
+        self.health_points = value
 
     @property
     def stamina(self):
-        return round(self._hp, 1)
+        return round(self.health_points, 1)
 
     @stamina.setter
     def stamina(self, value):
-        self._stamina = value
+        self.stamina_points = value
 
     @property
     def _target_armor(self) -> float:
